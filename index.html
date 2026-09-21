@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Davy Chen — FullStack Developer</title>
+<meta name="description" content="Davy Chen is a full-stack developer in China building a one-click pipeline that turns novels and biographies into movies. Come in." />
+<meta name="author" content="Davy Chen" />
+<meta name="theme-color" content="#efede7" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Davy Chen — FullStack Developer" />
+<meta property="og:description" content="Every novel already holds a film. Come in." />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231b1bff'/%3E%3Ctext x='50' y='73' font-size='64' font-weight='700' font-family='Arial,Helvetica,sans-serif' fill='%23ffffff' text-anchor='middle'%3ED%3C/text%3E%3C/svg%3E" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800;900&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="preload" as="image" href="image/film-hero.webp" />
+
+<style>
+/* ============================================================
+   TOKENS — concrete paper, hard black, one electric accent.
+   Deliberately opposites: no radius, no blur, no soft shadow.
+   ============================================================ */
+:root {
+  --paper:   #efede7;
+  --paper-2: #e4e1d8;
+  --panel:   #ffffff;
+  --ink:     #0b0b0b;
+  --ink-2:   #57534b;
+  --ink-3:   #8a857b;
+  --accent:  #1b1bff;
+  --acid:    #d9ff00;
+  --line:    2px;
+  --dot:     rgba(11, 11, 11, .09);
+
+  --font-display: "Archivo", "Arial Black", Impact, system-ui, sans-serif;
+  --font-body:    "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono:    "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --maxw: 1240px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image: radial-gradient(var(--dot) 1px, transparent 1.2px);
+  background-size: 26px 26px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, p { margin: 0; }
+img { max-width: 100%; display: block; }
+
+::selection { background: var(--acid); color: var(--ink); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 clamp(16px, 3vw, 28px);
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 200;
+  background: var(--acid);
+  color: var(--ink);
+  border: var(--line) solid var(--ink);
+  font-family: var(--font-mono);
+  font-size: .7rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: .6rem .9rem;
+}
+.skip:focus { left: 0; }
+
+/* ============================================================
+   TOP BAR — sticky, hairline hard rule, mono labels
+   ============================================================ */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: var(--paper);
+  border-bottom: var(--line) solid var(--ink);
+}
+.topbar-in {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  height: 50px;
+}
+.tb {
+  font-family: var(--font-mono);
+  font-size: .66rem;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.tb.mid {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  color: var(--ink);
+}
+.tb.mid i {
+  display: block;
+  width: 9px; height: 9px;
+  background: var(--acid);
+  border: var(--line) solid var(--ink);
+}
+
+/* ============================================================
+   COVER — type block left, framed still right
+   ============================================================ */
+.cover { padding: clamp(40px, 6vw, 84px) 0 clamp(44px, 6vw, 78px); }
+
+.cover-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.06fr) minmax(0, .94fr);
+  gap: clamp(28px, 5vw, 72px);
+  align-items: center;
+}
+
+.tagline {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: .64rem;
+  font-weight: 500;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  background: var(--accent);
+  color: #fff;
+  border: var(--line) solid var(--ink);
+  padding: .34rem .62rem;
+  margin-bottom: 1.5rem;
+}
+
+.cover h1 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(2.5rem, 7.4vw, 5rem);
+  line-height: .9;
+  letter-spacing: -.045em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+.cover h1 mark {
+  background: var(--acid);
+  color: var(--ink);
+  padding: 0 .08em;
+  -webkit-box-decoration-break: clone;
+          box-decoration-break: clone;
+}
+
+.lede {
+  font-size: clamp(.98rem, 1.5vw, 1.06rem);
+  color: var(--ink-2);
+  max-width: 48ch;
+  margin-bottom: 2.1rem;
+  padding-left: 1.05rem;
+  border-left: 5px solid var(--accent);
+}
+
+/* the single button */
+.enter {
+  display: inline-flex;
+  align-items: center;
+  gap: .7rem;
+  padding: 1rem 1.5rem;
+  border: var(--line) solid var(--ink);
+  border-radius: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-mono);
+  font-size: .76rem;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  box-shadow: 6px 6px 0 var(--accent);
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease, color .12s ease;
+}
+.enter svg { width: 17px; height: 17px; transition: transform .12s ease; }
+.enter:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0 var(--acid);
+}
+.enter:hover svg { transform: translateX(3px); }
+.enter:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--accent); }
+
+.hero-frame {
+  position: relative;
+  margin: 0;
+  background: var(--panel);
+  border: var(--line) solid var(--ink);
+  box-shadow: 10px 10px 0 var(--ink);
+}
+.hero-frame img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: 62% 50%;
+}
+.hero-frame figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: var(--line) solid var(--ink);
+  padding: .68rem .9rem;
+  font-family: var(--font-mono);
+  font-size: .62rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.hero-frame figcaption b { font-weight: 500; color: var(--ink); }
+
+/* ============================================================
+   TICKER — black strip, acid mono type, scrolling pipeline
+   ============================================================ */
+.ticker {
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--acid);
+  border-block: var(--line) solid var(--ink);
+}
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: slide 30s linear infinite;
+}
+.tk-run {
+  display: flex;
+  align-items: center;
+  gap: 2.2rem;
+  padding-right: 2.2rem;
+}
+.tk-run span {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: .85rem 0;
+}
+.tk-run span.sep { color: var(--paper); opacity: .45; padding: 0; }
+@keyframes slide {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ============================================================
+   GALLERY — frames in a hard black grid
+   ============================================================ */
+.gallery { padding: clamp(52px, 7vw, 96px) 0 clamp(52px, 7vw, 92px); }
+
+.sec-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: clamp(14px, 3vw, 34px);
+  border-top: var(--line) solid var(--ink);
+  padding-top: 1.15rem;
+  margin-bottom: clamp(28px, 4vw, 46px);
+}
+.sec-n {
+  font-family: var(--font-mono);
+  font-size: .66rem;
+  font-weight: 500;
+  letter-spacing: .18em;
+  background: var(--ink);
+  color: var(--paper);
+  padding: .3rem .5rem;
+}
+.sec-head h2 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(1.6rem, 3.8vw, 2.5rem);
+  line-height: .95;
+  letter-spacing: -.035em;
+  text-transform: uppercase;
+}
+.sec-head p {
+  color: var(--ink-2);
+  font-size: .99rem;
+  max-width: 58ch;
+  margin-top: .7rem;
+}
+.sec-meta {
+  font-family: var(--font-mono);
+  font-size: .62rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  text-align: right;
+  line-height: 1.9;
+}
+
+.stills {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--line);
+  background: var(--ink);
+  border: var(--line) solid var(--ink);
+}
+
+.still {
+  position: relative;
+  margin: 0;
+  background: var(--paper);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.still img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  transition: transform .55s cubic-bezier(.2, .8, .2, 1);
+}
+.still:hover img { transform: scale(1.045); }
+
+.still .num {
+  position: absolute;
+  top: 0; left: 0;
+  z-index: 2;
+  background: var(--accent);
+  color: #fff;
+  border-right: var(--line) solid var(--ink);
+  border-bottom: var(--line) solid var(--ink);
+  font-family: var(--font-mono);
+  font-size: .62rem;
+  letter-spacing: .14em;
+  padding: .28rem .5rem;
+  transition: background .18s ease, color .18s ease;
+}
+.still:hover .num { background: var(--acid); color: var(--ink); }
+
+.still figcaption {
+  margin-top: auto;
+  border-top: var(--line) solid var(--ink);
+  padding: 15px 17px 19px;
+}
+.still .t {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: .97rem;
+  line-height: 1.2;
+  letter-spacing: -.015em;
+  text-transform: uppercase;
+  margin-bottom: .35rem;
+}
+.still .d { display: block; font-size: .86rem; color: var(--ink-2); }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer {
+  background: var(--ink);
+  color: var(--paper);
+  border-top: var(--line) solid var(--ink);
+}
+.footer-in {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-block: 20px;
+  font-family: var(--font-mono);
+  font-size: .64rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(239, 237, 231, .72);
+}
+
+/* ============================================================
+   REVEAL
+   ============================================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity .5s cubic-bezier(.2, .7, .2, 1), transform .5s cubic-bezier(.2, .7, .2, 1);
+}
+.reveal.in { opacity: 1; transform: none; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 940px) {
+  .cover-grid { grid-template-columns: 1fr; }
+  .hero-frame img { aspect-ratio: 16 / 11; }
+  .hero-frame { box-shadow: 7px 7px 0 var(--ink); }
+}
+@media (max-width: 860px) {
+  .stills { grid-template-columns: 1fr; }
+  .still img { aspect-ratio: 16 / 10; }
+  .sec-head { grid-template-columns: auto minmax(0, 1fr); }
+  .sec-meta { display: none; }
+}
+@media (max-width: 720px) {
+  .tb.right { display: none; }
+}
+@media (hover: none) {
+  .still:hover img { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .ticker-track { animation: none; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+}
+</style>
+</head>
+
+<body>
+
+<a class="skip" href="#stills">Skip to the stills</a>
+
+<!-- ====================== TOP BAR ====================== -->
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <span class="tb">Davy Chen</span>
+    <span class="tb mid"><i aria-hidden="true"></i>novel2movie.com</span>
+    <span class="tb right">FullStack Dev · China</span>
+  </div>
+</header>
+
+<!-- ====================== COVER ====================== -->
+<section class="cover">
+  <div class="wrap cover-grid">
+
+    <div class="cover-copy">
+      <span class="tagline">Front door · 2026</span>
+
+      <h1>Every novel<br />already holds<br />a <mark>film</mark>.</h1>
+
+      <p class="lede">
+        This is the front door. Inside: who I am, what I build, and the one-click
+        pipeline I'm building to turn the books I love into the films I want to watch.
+      </p>
+
+      <a class="enter" href="personal/index.html">
+        Enter the site
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      </a>
+    </div>
+
+    <figure class="hero-frame">
+      <img src="image/film-hero.webp" alt="A strip of 35mm film rising out of an open hardcover book" fetchpriority="high" />
+      <figcaption>
+        <b>Fig. 01</b>
+        <span>Source material, 35mm</span>
+      </figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<!-- ====================== TICKER ====================== -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <div class="tk-run">
+      <span>Novel</span><span class="sep">◆</span>
+      <span>Screenplay</span><span class="sep">◆</span>
+      <span>Shot list</span><span class="sep">◆</span>
+      <span>Render</span><span class="sep">◆</span>
+      <span>Sound mix</span><span class="sep">◆</span>
+      <span>Film</span><span class="sep">◆</span>
+    </div>
+    <div class="tk-run">
+      <span>Novel</span><span class="sep">◆</span>
+      <span>Screenplay</span><span class="sep">◆</span>
+      <span>Shot list</span><span class="sep">◆</span>
+      <span>Render</span><span class="sep">◆</span>
+      <span>Sound mix</span><span class="sep">◆</span>
+      <span>Film</span><span class="sep">◆</span>
+    </div>
+  </div>
+</div>
+
+<main id="stills">
+
+  <!-- ====================== GALLERY ====================== -->
+  <section class="gallery">
+    <div class="wrap">
+
+      <div class="sec-head reveal">
+        <span class="sec-n">01</span>
+        <div>
+          <h2>From the cutting room</h2>
+          <p>
+            A few frames from the world this site is about — light, celluloid, and the
+            books that start it all.
+          </p>
+        </div>
+        <span class="sec-meta">Three frames<br />Stills · 2026</span>
+      </div>
+
+      <div class="stills">
+
+        <figure class="still reveal">
+          <span class="num" aria-hidden="true">01</span>
+          <img src="image/film-strip.webp" alt="Macro photograph of a blank 35mm film strip backlit on an amber lightbox" loading="lazy" decoding="async" />
+          <figcaption>
+            <span class="t">35mm, blank and waiting</span>
+            <span class="d">Every frame starts empty. That's the whole appeal.</span>
+          </figcaption>
+        </figure>
+
+        <figure class="still reveal">
+          <span class="num" aria-hidden="true">02</span>
+          <img src="image/cinema-seats.webp" alt="Rows of empty burgundy velvet cinema seats lit by warm amber light" loading="lazy" decoding="async" />
+          <figcaption>
+            <span class="t">Two hundred empty seats</span>
+            <span class="d">Somewhere in this room, the premiere is already scheduled.</span>
+          </figcaption>
+        </figure>
+
+        <figure class="still reveal">
+          <span class="num" aria-hidden="true">03</span>
+          <img src="image/reel-books.webp" alt="A vintage film reel, a wooden clapperboard and a stack of old hardcover books on cream linen" loading="lazy" decoding="async" />
+          <figcaption>
+            <span class="t">Reel, slate, spines</span>
+            <span class="d">The whole kit: what I read in the evening, what I ship by day.</span>
+          </figcaption>
+        </figure>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-in">
+    <span>&copy; <span id="year">2026</span> Davy Chen</span>
+    <span>Reading books. Rendering films.</span>
+    <span>FullStack Developer · China</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var y = document.getElementById("year");
+  if (y) y.textContent = String(new Date().getFullYear());
+
+  var els = document.querySelectorAll(".reveal");
+  if (!("IntersectionObserver" in window)) {
+    els.forEach(function (el) { el.classList.add("in"); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry, i) {
+      if (!entry.isIntersecting) return;
+      var el = entry.target;
+      window.setTimeout(function () { el.classList.add("in"); }, Math.min(i * 90, 270));
+      io.unobserve(el);
+    });
+  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+  els.forEach(function (el) { io.observe(el); });
+})();
+</script>
+
+</body>
+</html>
